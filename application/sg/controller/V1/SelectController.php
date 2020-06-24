@@ -43,8 +43,8 @@ class SelectController extends Controller
 		if( '1' == $this->request->post('blms_active_type') ){
 			$this->getBlmsWeight($connect);
 		}
-		//$filter_name = 1 === $config['isnew'] ? 'paper_code' : 'paper as paper_code';
-		$filter_name = 'paper_code';
+		$filter_name = 1 === $config['isnew'] ? 'paper_code' : 'paper as paper_code';
+		//$filter_name = 'paper_code';
 		try {
 			$data = Db::connect($connect)
 			->table('view_myorder')
@@ -208,13 +208,13 @@ class SelectController extends Controller
 				$condition[] = ['company_name','like','%' . $data['scdd_company_name'] . '%'];
 			}
 		}
-		/*$field = 1 === config('app.db_config')[$data['scdd_config_index']]['isnew'] ? 'paper_code' : 'paper';
+		$field = 1 === config('app.db_config')[$data['scdd_config_index']]['isnew'] ? 'paper_code' : 'paper';
 		if( isset($data['scdd_paper_code']) && !empty($data['scdd_paper_code']) ){
 			$condition[] = [$field,'like','%' . $data['scdd_paper_code'] . '%']; 
-		}*/
-		if( isset($data['scdd_paper_code']) && !empty($data['scdd_paper_code']) ){
-			$condition[] = ['paper_code','like','%' . $data['scdd_paper_code'] . '%']; 
 		}
+		/*if( isset($data['scdd_paper_code']) && !empty($data['scdd_paper_code']) ){
+			$condition[] = ['paper_code','like','%' . $data['scdd_paper_code'] . '%']; 
+		}*/
 
 		if( isset($data['scdd_flute_type']) && !empty($data['scdd_flute_type']) ){
 			$condition[] = ['flute_type','=',$data['scdd_flute_type']];
@@ -290,13 +290,13 @@ class SelectController extends Controller
 				$condition[] = ['company_name','like','%' . $data['wgdd_company_name'] . '%'];
 			}
 		}
-		/*$field = 1 === config('app.db_config')[$data['wgdd_config_index']]['isnew'] ? 'paper_code' : 'paper';
+		$field = 1 === config('app.db_config')[$data['wgdd_config_index']]['isnew'] ? 'paper_code' : 'paper';
 		if( isset($data['wgdd_paper_code']) && !empty($data['wgdd_paper_code']) ){
 			$condition[] = [$field,'like','%' . $data['wgdd_paper_code'] . '%']; 
-		}*/
-		if( isset($data['wgdd_paper_code']) && !empty($data['wgdd_paper_code']) ){
-			$condition[] = ['paper_code','like','%' . $data['wgdd_paper_code'] . '%']; 
 		}
+		/*if( isset($data['wgdd_paper_code']) && !empty($data['wgdd_paper_code']) ){
+			$condition[] = ['paper_code','like','%' . $data['wgdd_paper_code'] . '%']; 
+		}*/
 
 		if( isset($data['wgdd_flute_type']) && !empty($data['wgdd_flute_type']) ){
 			$condition[] = ['flute_type','=',$data['wgdd_flute_type']];
