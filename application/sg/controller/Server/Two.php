@@ -30,7 +30,7 @@ class Two extends Controller
 
     protected function analyzeUDP()
 	{
-		return AnalyzeData::analyzeUdp($this->db_index);
+		return AnalyzeData::analyzeUdp($this->config_index);
 	}
 
 }

@@ -12,14 +12,15 @@
 //生管专用
 Route::group(':version/sg/',function(){
 	Route::post('login','.LoginController/login');
+	Route::post('factoryName','.LoginController/getFactoryName');
 })->prefix('sg/:version');
 
 Route::group(':version/sg/',function(){
 
 	Route::post('alertGetValue','.AlterController/getValue');
 	Route::post('alertChangeValue','.AlterController/changeValue');
-	Route::post('alertGetRecord','.AlterController/getRecord');
-	Route::post('alertClearRecord','.AlterController/clearRecord');
+	//Route::post('alertGetRecord','.AlterController/getRecord');
+	//Route::post('alertClearRecord','.AlterController/clearRecord');
 
 	Route::get('selectConfig','.SelectController/getConfig');
 	Route::post('selectGetBl','.SelectController/getBl');
@@ -28,4 +29,16 @@ Route::group(':version/sg/',function(){
 	Route::post('selectGetWgdd','.SelectController/getWgdd');
 	Route::post('selectBlms','.SelectController/getBlms');
 
+	Route::post('userList','.UserController/fetchList');
+	Route::post('userDoEdit','.UserController/doEdit');
+	Route::post('userDoStatus','.UserController/doStatus');
 })->prefix('sg/:version')->middleware(['CheckSg']);
+
+Route::group(':version/sg/',function(){
+	Route::get('detectApi','.HideController/detect');
+})->prefix('sg/:version');
+
+Route::group('sg/',function(){
+	Route::get('dataV/choose','Index/choose');
+	Route::post('dataV/fetchData','Index/fetchData');
+})->prefix('sg/');

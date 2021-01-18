@@ -17,8 +17,9 @@ class One extends Controller
         $config = config('db_config')[ $this->config_index ];
         $this->socket = new SocketIO($config['socketio']['port']);
         $this->socket->on('workerStart', function($socket){
-            Timer::add(2,function(){
+            Timer::add(1,function(){
                 $buf = $this->analyzeUDP();
+                $buf = json_decode($buf);
                 $this->socket->emit('udpMsg' . $this->config_index,$buf );
             });
         });
@@ -30,7 +31,7 @@ class One extends Controller
 
     protected function analyzeUDP()
     {
-        return AnalyzeData::analyzeUdp($this->db_index);
+        return AnalyzeData::analyzeUdp($this->config_index);
     }
 
 }

@@ -8,8 +8,8 @@ use think\facade\Request;
 class LoginValidate extends Validate
 {
 	protected $rule = [
-		'user_name' => 'require|max:5',
-		'user_pass' => 'require|max:5'
+		'user_name' => 'require',
+		'user_pass' => 'require'
 	];
 	
 }

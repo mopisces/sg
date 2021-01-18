@@ -11,11 +11,24 @@
 
 return [
     // 数据库类型
+   /* 'type'            => 'sqlsrv',
+    // 服务器地址
+    'hostname'        => '192.168.1.209',
+    // 数据库名
+    'database'        => 'cpmsdbfh',
+    // 用户名
+    'username'        => 'sa',
+    // 密码
+    'password'        => 'sakey',
+    // 端口
+    'hostport'        => '1434',
+    // 连接dsn
+    'dsn'             => 'sqlsrv:Server=LDWIN10\LDWIN102008,1434;Database=cpmsdbfh',*///erpvdh
     'type'            => 'sqlsrv',
     // 服务器地址
-    'hostname'        => 'localhost',
+    'hostname'        => 'localhost',//192.168.1.102
     // 数据库名
-    'database'        => 'erpvdh',
+    'database'        => 'erpvdh',//erpv3order erpvdh erpv3temp erpv3rc
     // 用户名
     'username'        => 'sa',
     // 密码

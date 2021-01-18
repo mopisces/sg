@@ -1,5 +1,7 @@
 @echo off
 REM start sg_monitor
-"D:\XAMPP\php\php.exe" -f C:\Users\HP\Desktop\work-doc\sg\sg_monitor\public\one.php
-"D:\XAMPP\php\php.exe" -f C:\Users\HP\Desktop\work-doc\sg\sg_monitor\public\two.php
+rem "D:\XAMPP\php\php.exe" -f C:\Users\HP\Desktop\work-doc\project\sg\public\one.php
+rem "D:\XAMPP\php\php.exe" -f C:\Users\HP\Desktop\work-doc\project\sg\public\two.php
+"D:\XAMPP\php\php.exe" -f C:\Users\HP\Desktop\work-doc\project\sg\public\dh.php
+
 pause

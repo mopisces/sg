@@ -12,7 +12,7 @@ class CoreRun
             header('Access-Control-Allow-Origin:'.$value); 
         }
         header('Access-Control-Allow-Methods:POST,GET,OPTIONS');  
-        header('Access-Control-Allow-Headers:Authentication,content-type');
+        header('Access-Control-Allow-Headers:Authentication,content-type,session');
         if( $request->isOptions() ) {
             exit();
         }

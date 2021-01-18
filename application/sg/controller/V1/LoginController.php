@@ -12,26 +12,25 @@ class LoginController extends Controller
 	public function login()
 	{
 		$this->validate( $this->request->post(),'app\sg\validate\LoginValidate' );
-		$data = $this->request->post('user_name') . '/' . $this->request->post('user_pass');
-		$info = [];
-		switch ( $data ) {
-			case config('sg_user0'):
-				$info['root'] = 0; 
-				break;
-			case config('sg_user1'):
-				$info['root'] = 1; 
-				break;
-			case config('sg_user2'):
-				$info['root'] = 2; 
-				break;
-			default:
-				throw new \app\common\exception\SgException(['msg'=>'用户名或密码错误']);
-				break;
+		$info = Db::table('W_UserTable')
+		->where([
+			'user'   => $this->request->post('user_name'),
+			'pass'   => $this->request->post('user_pass'),
+		])
+		->find();
+		if( $info == NULL ){
+			throw new \app\common\exception\SgException(['msg'=>'用户名或密码错误']);
 		}
-		$info['data'] = $data;
+		if( $info['status'] == '0' ){
+			throw new \app\common\exception\SgException(['msg'=>'账号暂未启用']);
+		}
 		$access_token_info = array_merge(['iss'=>'jp-erp','iat'=>time(),'exp'=> time() + config('app.jwt_alive_time')],$info);
 		$access_token  = JWT::encode($access_token_info,config('app.jwt_salt'));
-
 		return ['errorCode'=>'00000','msg'=>'登录成功','result'=>[ 'access_token' => $access_token, 'root' => $info['root'] ]];
+	}
+
+	public function getFactoryName()
+	{
+		return ['errorCode'=>'00000','msg'=>'返回成功','result'=>config('factory_name')];
 	}
 }

@@ -44,8 +44,10 @@ class AnalyzeData
 					$result = self::getNotNewNotUpdown( $buf, $config );
 				}
 			}
-		}
-		return $result;
+			return ['ret' => '1', 'data' => $result];
+		}	
+		return ['ret' => '0', 'data' => NULL];
+		
 	}
 
 	protected static function getNewUpdown( $buf )

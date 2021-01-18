@@ -10,7 +10,7 @@ class AlterValidate extends Validate
 	protected $rule = [
 		'alter_config_index'  => ['require','regex'=>'/^[0-9]+$/','checkIndex'],
 		'change_config_index' => ['require','regex'=>'/^[0-9]+$/','checkIndex'],
-		'change_id'           => ['require','regex'=>'/^[1-9]+[0-9]*$/','max:5'],
+		'change_id'           => ['regex'=>'/^[1-9]+[0-9]*$/','max:5'],
 		'change_value'        => ['require','regex'=>'/^[1-9]+[0-9]*$/','max:5'],
 	];
 	

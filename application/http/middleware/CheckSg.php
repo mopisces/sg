@@ -12,15 +12,14 @@ class CheckSg
     	if( NULL === $request->header('Authentication') ){
             throw new \app\common\exception\SgException(['msg'=>'Authentication参数未定义']);
         }
-        /*var_dump($request->header('Authentication'));
-        var_dump(Config::get('app.jwt_salt'));
-        die;*/
         $info = (array)JWT::decode($request->header('Authentication'),Config::get('app.jwt_salt'),["HS256"]);
-        if( !isset($info['root']) || empty($info['root']) ){
-            throw new \app\common\exception\SgException(['msg'=>'权限受限制']);
+        $result = Db::table('W_UserTable')
+        ->where(['user'=>$info['user'],'pass'=>$info['pass'],'status'=>1])
+        ->find();
+        if( $result == NULL ){
+            throw new \app\common\exception\AuthException();
         }
-        $factory_id = Db::table('WebConfig')->where('Name','FactoryId')->value('Value');
-    	Config::set('app.factory_id',$factory_id);
+        $request->info = $result;
     	return $next($request);
     }
 }

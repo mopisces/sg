@@ -10,10 +10,11 @@ class SelectController extends Controller
 	protected $failException = true;
 	protected $scddPageSize = 3;
 	protected $wgddPageSize = 3;
+	protected $openWeightBl = 0;
 
 	public function getConfig()
 	{
-		return ['errorCode'=>'00000','msg'=>'返回成功','result'=>config('db_config')];
+		return ['errorCode'=>'00000','msg'=>'返回成功','result'=>config('db_config'), 'weight' => $this->openWeightBl];
 	}
 
 	public function getBl()
@@ -40,16 +41,15 @@ class SelectController extends Controller
 		$this->validate( $this->request->post(),'app\sg\validate\SelectValidate.getBlms' );
 		$config = config('app.db_config')[$this->request->post('blms_config_index')];
 		$connect = util::getConnect( $config );
-		if( '1' == $this->request->post('blms_active_type') ){
+		if( '1' == $this->request->post('blms_active_type') && $this->openWeightBl == 1 ){
 			$this->getBlmsWeight($connect);
 		}
-		$filter_name = 1 === $config['isnew'] ? 'paper_code' : 'paper as paper_code';
-		//$filter_name = 'paper_code';
+		$filter_name = 1 === $config['isnew'] ? 'paper_code' : 'paper';
 		try {
 			$data = Db::connect($connect)
 			->table('view_myorder')
 			->whereExp($filter_name,'IS NOT NULL')
-			->field('sn,' . $filter_name . ',width as paper_width,(paper_len * cutting_qty / 1000.0) as paper_length')
+			->field('sn,' . $filter_name . ' as paper_code,width as paper_width,(paper_len * cutting_qty / 1000.0) as paper_length')
 			->order('sn')
 			->select();
 			$flute = Db::connect($connect)->query('exec P_GetFlute')[0];
@@ -162,13 +162,13 @@ class SelectController extends Controller
 		$this->validate( $this->request->post(),'app\sg\validate\SelectValidate.getScdd' );
 		$condition = $this->getConditionScdd($this->request->post());
 		$connect = util::getConnect( config('app.db_config')[$this->request->post('scdd_config_index')] );
-		$count = Db::connect($connect)->table('view_myorder_up_down')->where($condition)->count();
+		$count = Db::connect($connect)->table('view_myorder')->where($condition)->count();
 		$size = 1 === config('app.db_config')[$this->request->post('scdd_config_index')]['updown'] ? 2:1;
 		$data = [];
 		$info = [];
 		if( 0 != $count ){
 			$data = Db::connect($connect)
-			->table('view_myorder_up_down')
+			->table('view_myorder')
 			->where($condition)
 			->order('sn,tag','desc')
 			->page($this->request->post('cur_page'),$this->scddPageSize * $size )

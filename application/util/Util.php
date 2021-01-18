@@ -25,8 +25,8 @@ class Util
 			'database' => $data['DB_NAME'],
 			'username' => $data['DB_USER'],
 			'password' => $data['DB_PWD'],
-			'hostport' => '',
-			'dsn'      => ''
+			'hostport' => '1434',
+			//'dsn'      => 'sqlsrv:Server=LDWIN10\LDWIN102008,1434' . ';Database=' . $data['DB_NAME']
 		];
 	}
 }

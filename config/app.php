@@ -143,7 +143,9 @@ return [
     // 异常处理handle类 留空使用 \think\exception\Handle
     'exception_handle'       => '\\app\\common\\exception\\ExceptionHandler',
     // jwt盐值
-    'jwt_salt'               => 'sclx',
+    'jwt_salt'               => 'jpdn',
     // jwt过期时间
-    'jwt_alive_time'         => 3600 * 24
+    'jwt_alive_time'         => 3600 * 24,
+
+    'factory_id' => 'FH'
 ];
