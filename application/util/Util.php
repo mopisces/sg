@@ -25,8 +25,17 @@ class Util
 			'database' => $data['DB_NAME'],
 			'username' => $data['DB_USER'],
 			'password' => $data['DB_PWD'],
-			'hostport' => '1434',
-			//'dsn'      => 'sqlsrv:Server=LDWIN10\LDWIN102008,1434' . ';Database=' . $data['DB_NAME']
+			'hostport' => $data['DB_PORT'] ? $data['DB_PORT'] : '1434',
+			'dsn'      => 'sqlsrv:Server=' . $config['DB_HOST'] . ';Database=' . $data['DB_NAME']
 		];
+	}
+
+	public function byteTostr( $hex )
+	{
+		$str = '';
+        for( $i = 0 ; $i < strlen( $hex ) - 1; $i += 2 ){
+            $str .= chr( hexdec( $hex[$i].$hex[ $i + 1 ] ) );
+        }
+        return $str;
 	}
 }

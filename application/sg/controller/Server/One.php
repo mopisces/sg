@@ -19,8 +19,8 @@ class One extends Controller
         $this->socket->on('workerStart', function($socket){
             Timer::add(1,function(){
                 $buf = $this->analyzeUDP();
-                $buf = json_decode($buf);
-                $this->socket->emit('udpMsg' . $this->config_index,$buf );
+                $buf = json_encode($buf);
+                $this->socket->emit('AnalyUdpData' . $this->config_index,$buf );
             });
         });
         $this->socket->on('disconnect', function($socket){
