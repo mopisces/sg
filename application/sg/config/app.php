@@ -132,6 +132,7 @@ return [
                 'timer'  => 1,//php中间层接受udp的时间间隔（单位：秒，决定了前端页面显示的数据每隔多少秒刷新1次）
                 'domain' => 'http://127.0.0.1:40000',//'http://test.leaper.ltd:8888',
             ],
+            //DB_DATA是0时,socket_bind参数必填
             'socket_bind' => [
                 'address' => '192.168.1.61',//安装php环境的电脑内网ip
                 'port'    => 3000,//“飞机”配置的端口号 有可能要+1（不同线不一样）
