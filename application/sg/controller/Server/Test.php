@@ -12,10 +12,11 @@ use util;
 class Test extends Controller
 {
     protected $socket;
-    protected $config_index = 0;
+    protected $config_index = NULL;
 
-    public function index()
+    public function index($config_index)
     {
+        $this->config_index = $config_index;
         $config = config('db_config')[ $this->config_index ];
         $this->socket = new SocketIO($config['socketio']['port']);
         $this->socket->on('workerStart', function($socket)use($config){

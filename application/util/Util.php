@@ -25,8 +25,8 @@ class Util
 			'database' => $data['DB_NAME'],
 			'username' => $data['DB_USER'],
 			'password' => $data['DB_PWD'],
-			'hostport' => $data['DB_PORT'] ? $data['DB_PORT'] : '1434',
-			'dsn'      => 'sqlsrv:Server=' . $config['DB_HOST'] . ';Database=' . $data['DB_NAME']
+			'hostport' => isset($data['DB_PORT']) ? $data['DB_PORT'] : '1434',
+			'dsn'      => 'sqlsrv:Server=' . $data['DB_HOST'] . ';Database=' . $data['DB_NAME']
 		];
 	}
 
