@@ -23,6 +23,7 @@ class Core extends Controller
             Timer::add(1,function()use($config){
                 if( $config['DB_DATA'] ){
                     $data = json_encode($this->getDataFromDB());
+                    var_dump($data);die;
                 }else{
                     $data = json_encode($this->analyzeUDP());
                 }
@@ -45,7 +46,8 @@ class Core extends Controller
         $config = config('db_config')[ $this->config_index ];
         $connect = util::getConnect($config);
         $data = Db::connect($connect)->table('proddata')->where('id',1)->value('data');
-        $data = substr(str_replace(" ", '', $data), 2);
+        //$data = substr(str_replace(" ", '', $data), 2);
+        $data = str_replace(" ", '', $data);
         return AnalyzeData::analyzeUdp( $this->config_index, $this->byteTostr($data) );
     }
 

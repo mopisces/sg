@@ -229,9 +229,9 @@ class SelectController extends Controller
 	{
 		$result = [ 
 			'minDate'   => date('Y-m-d',strtotime('-1 year')) ,
-			'maxDate'   => date('Y-m-d',strtotime('now')),
+			'maxDate'   => date('Y-m-d',strtotime('+1 day')),
 			'beginDate' => date('Y-m-d',strtotime('now')),
-			'endDate'   => date('Y-m-d',strtotime('now')),
+			'endDate'   => date('Y-m-d',strtotime('+1 day')),
 		];
 		return ['errorCode'=>'00000','msg'=>'返回成功','result'=>$result];
 	}

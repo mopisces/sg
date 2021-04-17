@@ -47,7 +47,7 @@ class SelectValidate extends Validate
 
 	protected function checkWgddDate( $value,$rule,$data,$fieldName )
 	{
-		$date_config = [ [ 'Name'=>'MaxTime' , 'Value'=>time() ], [ 'Name'=>'MinTime' , 'Value'=>strtotime('-1 year') ] ];
+		$date_config = [ [ 'Name'=>'MaxTime' , 'Value'=>strtotime('+1 day') ], [ 'Name'=>'MinTime' , 'Value'=>strtotime('-1 year') ] ];
 		foreach ($date_config as $k => $v) {
 			if( $v['Name'] === 'MaxTime' ){
 				if( strtotime($value) > $date_config[$k]['Value'] ){
