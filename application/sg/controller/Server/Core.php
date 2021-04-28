@@ -22,10 +22,9 @@ class Core extends Controller
         $this->socket->on('workerStart', function($socket)use($config){
             Timer::add(1,function()use($config){
                 if( $config['DB_DATA'] ){
-                    $data = json_encode($this->getDataFromDB());
-                    var_dump($data);die;
+                    $data = $this->getDataFromDB() ? $this->getDataFromDB() : '';
                 }else{
-                    $data = json_encode($this->analyzeUDP());
+                    $data = $this->analyzeUDP();
                 }
                 $this->socket->emit('AnalyUdpData' . $this->config_index,$data );
             });
@@ -38,17 +37,23 @@ class Core extends Controller
 
     protected function analyzeUDP()
     {
-        return AnalyzeData::analyzeUdp($this->config_index);
+        $result = AnalyzeData::analyzeUdp($this->config_index);
+        return json_encode($result);
     }
 
     protected function getDataFromDB()
     {
         $config = config('db_config')[ $this->config_index ];
         $connect = util::getConnect($config);
-        $data = Db::connect($connect)->table('proddata')->where('id',1)->value('data');
-        //$data = substr(str_replace(" ", '', $data), 2);
-        $data = str_replace(" ", '', $data);
-        return AnalyzeData::analyzeUdp( $this->config_index, $this->byteTostr($data) );
+        try {
+            $data = Db::connect($connect)->table('proddata')->where('id',1)->value('data');
+            //$data = substr(str_replace(" ", '', $data), 2);
+            $data = str_replace(" ", '', $data);
+            $result = AnalyzeData::analyzeUdp( $this->config_index, $this->byteTostr($data) );
+            return json_encode($result);
+        } catch ( \Exception $e) {
+            return false;
+        }
     }
 
     protected function byteTostr($hex)

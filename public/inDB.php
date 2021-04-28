@@ -6,4 +6,4 @@ namespace think;
 require __DIR__ . '/../thinkphp/base.php';
 
 // 执行应用并响应（绑定）
-Container::get('app')->bind('sg/Server.Test/inDB')->run()->send();
+Container::get('app')->bind('sg/Server.Mid/index')->run()->send();
