@@ -177,6 +177,9 @@ class SelectController extends Controller
 				if( isset($value['pre_finishtime']) && $value['pre_finishtime'] ){
 					$data[$key]['pre_finishtime'] = date('Y-m-d H:i:s',strtotime($value['pre_finishtime']));
 				}
+				if( isset($value['finish_time']) && $value['finish_time'] ){
+					$data[$key]['pre_finishtime'] = date('Y-m-d H:i:s',strtotime($value['finish_time']));
+				}
 			}
 			if( 2 === $size ){
 				foreach ($data as $key => $value) {
@@ -184,8 +187,12 @@ class SelectController extends Controller
 				}
 				$info = array_values($info);
 				foreach ($info as $info_key => $info_value) {
-					$result[] = $info_value[1];
-					$result[] = $info_value[0];
+					if( isset( $info_value[1] ) ){
+						$result[] = $info_value[1];
+					}
+					if( isset( $info_value[0] ) ){
+						$result[] = $info_value[0];
+					}
 				}
 			}else{
 				$result = $data;
@@ -267,8 +274,12 @@ class SelectController extends Controller
 			}
 			$result = array_values($result);
 			foreach ($result as $res_key => $res_value) {
-				$return[] = $res_value[0];
-				$return[] = $res_value[1];
+				if( isset( $res_value[0] ) ){
+					$return[] = $res_value[0];
+				}
+				if( isset( $res_value[1] ) ){
+					$return[] = $res_value[1];
+				}
 			}
 		}else{
 			$return = $data;

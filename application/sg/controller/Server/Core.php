@@ -52,7 +52,7 @@ class Core extends Controller
             $result = AnalyzeData::analyzeUdp( $this->config_index, $this->byteTostr($data) );
             return json_encode($result);
         } catch ( \Exception $e) {
-            return false;
+            return json_encode(['ret'=>0,'data'=>NULL]);;
         }
     }
 
