@@ -32,6 +32,9 @@ Route::group(':version/sg/',function(){
 	Route::post('userList','.UserController/fetchList');
 	Route::post('userDoEdit','.UserController/doEdit');
 	Route::post('userDoStatus','.UserController/doStatus');
+
+	Route::post('statis/getConfig','.StatisController/getStatisConfig');
+	Route::post('statis/getStatisData', '.StatisController/getStatisData');
 })->prefix('sg/:version')->middleware(['CheckSg']);
 
 Route::group(':version/sg/',function(){

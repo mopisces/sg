@@ -99,7 +99,7 @@ class AnalyzeData
 				'hzl'   => self::byteToInt($buf,237)/100,
 				'xbl'   => self::byteToInt($buf,241)/100,
 			],
-			'huiji' => [
+			'huji' => [
 				'cs' => self::byteToInt($buf,265),
 				'sy' => round(self::byteToInt($buf,285)/1000,0),
 				'lj' => round(self::byteToInt($buf,289)/1000,0),
@@ -411,7 +411,7 @@ class AnalyzeData
 				'hzl'   => util::byteToInt($buf,237)/100,
 				'xbl'   => util::byteToInt($buf,241)/100,
 			],
-			'huiji' => [
+			'huji' => [
 				'cs' => util::byteToInt($buf,265),
 				'sy' => round(util::byteToInt($buf,285)/1000,0),
 				'lj' => round(util::byteToInt($buf,289)/1000,0),

@@ -31,7 +31,8 @@ if '%1'=='ELEV' (del "%vbsGetPrivileges%" 1>nul 2>nul  &  shift /1)
 ::     启动过程     ::
 :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 :-------------------------------------- 
+::重启制定任务完成后关闭运行的cmd.exe
 net stop AliyunDdns
 net start AliyunDdns
-pause
+taskkill /f /t /im cmd.exe
 exit
