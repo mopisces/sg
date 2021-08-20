@@ -28,7 +28,7 @@ return [
     // 服务器地址
     'hostname'        => 'localhost',//192.168.1.102
     // 数据库名
-    'database'        => 'erpvdh',//erpv3order erpvdh erpv3temp erpv3rc
+    'database'        => 'cimbdv4.1',//erpv3order erpvdh erpv3temp erpv3rc
     // 用户名
     'username'        => 'sa',
     // 密码
@@ -36,7 +36,7 @@ return [
     // 端口
     'hostport'        => '1433',
     // 连接dsn
-    'dsn'             => 'sqlsrv:Server=.\MWJ;Database=erpvdh',
+    'dsn'             => 'sqlsrv:Server=.\MWJ;Database=cimbdv4.1',
     // 数据库连接参数
     'params'          => [],
     // 数据库编码默认采用utf8

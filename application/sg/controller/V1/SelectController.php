@@ -166,6 +166,7 @@ class SelectController extends Controller
 		$size = 1 === config('app.db_config')[$this->request->post('scdd_config_index')]['updown'] ? 2:1;
 		$data = [];
 		$info = [];
+		$result = [];
 		if( 0 != $count ){
 			$data = Db::connect($connect)
 			->table('view_myorder')

@@ -3,6 +3,7 @@ namespace app\common\udp;
 
 use think\facade\Config;
 use util;
+use think\Db;
 
 class AnalyzeData
 {
@@ -40,9 +41,9 @@ class AnalyzeData
 		self::$isFromDb = $config['DB_DATA'] == '0' ? false : true;
 		if( $config['isnew'] ){
 			if( $config['updown'] ){
-				$result = self::getNewUpdown( $buf );
+				$result = self::getNewUpdown( $buf, $config );
 			}else{
-				$result = self::getNewNotUpdown( $buf );
+				$result = self::getNewNotUpdown( $buf, $config );
 			}
 		}else{
 			if( $config['updown'] ){
@@ -55,10 +56,10 @@ class AnalyzeData
 		
 	}
 
-	protected static function getNewUpdown( $buf )
+	protected static function getNewUpdown( $buf, $config )
 	{
 		$result = [
-			'class'  => chr($buf[709]),
+			'class'  => self::getClass($config, $buf),//chr($buf[709]),
 			'qds1'   => self::byteToInt($buf,53),
 			'scds1'  => self::byteToInt($buf,17),
 			'syds1'  => self::byteToInt($buf,21),
@@ -123,10 +124,10 @@ class AnalyzeData
 		return $result;
 	}
 
-	protected static function getNewNotUpdown( $buf )
+	protected static function getNewNotUpdown( $buf, $config )
 	{
 		$result = [
-			'class'  => chr($buf[709]),
+			'class'  => self::getClass($config, $buf),//chr($buf[709]),
 			'qds'    => self::byteToInt($buf,53),
 			'scds'   => self::byteToInt($buf,17),
 			'syds'   => self::byteToInt($buf,21),
@@ -312,6 +313,21 @@ class AnalyzeData
 			$k -= 8;
 		}
 		return util::byteToInt( $arr, $k );
+	}
+
+	protected static function getClass( $config, $buf )
+	{
+		if( self::$isFromDb ){
+			$connect = util::getConnect( $config );
+			try {
+				$class = Db::connect($connect)->query('SELECT new_shift FROM ShiftLog WHERE id = ( SELECT max(id) From ShiftLog )')[0]['new_shift'];
+			} catch ( \Exception $e) {
+				$class = '-';
+			}
+		} else {
+			$class = chr($buf[709]);
+		}
+		return $class;
 	}
 
 }/*

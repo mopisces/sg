@@ -35,7 +35,7 @@ return [
             'DB_USER'            => 'sa', //用户名
             'DB_PWD'             => 'karry', //密码
             'DB_NAME'            => 'cimdbv4', //数据库名
-            'isnew'              => 1, //老生管0 新生管1
+            'isnew'              => 0, //老生管0 新生管1
             'updown'             => 0, //单刀0 上下刀1
             'paperCodeNumber'    => 1, //纸质代码占几个字符
             'paperCodeSpaceChar' => '-',
@@ -57,7 +57,7 @@ return [
             'DB_USER'            => 'sa', //用户名
             'DB_PWD'             => 'karry', //密码
             'DB_NAME'            => 'cpmsdbfh', //数据库名
-            'isnew'              => 1, //老生管0 新生管1
+            'isnew'              => 0, //老生管0 新生管1
             'updown'             => 0, //单刀0 上下刀1
             'paperCodeNumber'    => 1, //纸质代码占几个字符
             'paperCodeSpaceChar' => '-',
