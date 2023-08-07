@@ -36,12 +36,3 @@ Route::group(':version/sg/',function(){
 	Route::post('statis/getConfig','.StatisController/getStatisConfig');
 	Route::post('statis/getStatisData', '.StatisController/getStatisData');
 })->prefix('sg/:version')->middleware(['CheckSg']);
-
-Route::group(':version/sg/',function(){
-	Route::get('detectApi','.HideController/detect');
-})->prefix('sg/:version');
-
-Route::group('sg/',function(){
-	Route::get('dataV/choose','Index/choose');
-	Route::post('dataV/fetchData','Index/fetchData');
-})->prefix('sg/');

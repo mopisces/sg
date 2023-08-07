@@ -29,12 +29,12 @@ class ExceptionHandler extends Handle
             $this->msg = $e->msg;
         }
         // Http异常
-        elseif ($e instanceof \think\exception\HttpException)
+        /*elseif ($e instanceof \think\exception\HttpException)
         {
             $this->errorCode = 20202;
             //$this->msg = 'http_error_code:' . $e->getMessage();
             $this->msg = '请求地址错误~';
-        }
+        }*/
         // 参数验证异常
         elseif($e instanceof \think\exception\ValidateException)
         {

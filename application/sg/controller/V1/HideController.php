@@ -8,7 +8,7 @@ class HideController extends Controller
 {
 	protected $failException = true;
 
-	public function detect()
+	/*public function detect()
 	{
 		$config = config('db_config')
 		foreach ($config as $key => $value) {
@@ -24,5 +24,10 @@ class HideController extends Controller
             ];
 		}
 		return ['errorCode'=>'00000','msg'=>null,'result'=>$result];
+	}*/
+		//json_decode($GLOBALS['HTTP_RAW_POST_DATA'],true)
+	public function testjava()
+	{
+		return ['Code'=>-1,'Message'=>"测试接口返回失败"];
 	}
 }

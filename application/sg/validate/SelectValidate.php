@@ -3,7 +3,6 @@ namespace app\sg\validate;
 
 use think\Validate;
 use think\Db;
-use think\facade\Request;
 
 class SelectValidate extends Validate
 {

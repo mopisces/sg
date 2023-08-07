@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c5ab70c5eb7eadac45ab90d3810b7ed7",
+    "content-hash": "a87527ed038aa1fbdbfc3396d7bd74f5",
     "packages": [
         {
             "name": "firebase/php-jwt",
@@ -201,6 +201,46 @@
             ],
             "homepage": "http://www.workerman.net",
             "time": "2018-07-02T02:42:37+00:00"
+        },
+        {
+            "name": "workerman/gateway-worker",
+            "version": "v3.0.20",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/walkor/GatewayWorker.git",
+                "reference": "75b21653b3eaa99c4d5ae84ce8c5b27cda96d095"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/walkor/GatewayWorker/zipball/75b21653b3eaa99c4d5ae84ce8c5b27cda96d095",
+                "reference": "75b21653b3eaa99c4d5ae84ce8c5b27cda96d095",
+                "shasum": "",
+                "mirrors": [
+                    {
+                        "url": "https://mirrors.aliyun.com/composer/dists/%package%/%reference%.%type%",
+                        "preferred": true
+                    }
+                ]
+            },
+            "require": {
+                "workerman/workerman": ">=3.5.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "GatewayWorker\\": "./src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "homepage": "http://www.workerman.net",
+            "keywords": [
+                "communication",
+                "distributed"
+            ],
+            "time": "2021-04-13T13:19:21+00:00"
         },
         {
             "name": "workerman/phpsocket.io",

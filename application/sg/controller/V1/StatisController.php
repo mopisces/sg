@@ -123,7 +123,7 @@ class StatisController extends Controller
 				}
 			}
 			$final = [];
-			if( size($all) > 0 ){
+			if( count($all) > 0 ){
 				foreach ($all as $key => $value) {
 					if( isset( $all[ $value['statis_date'] ] ) ){
 						$field = array_keys($value);

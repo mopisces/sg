@@ -38,4 +38,20 @@ class Util
         }
         return $str;
 	}
+
+	public function sqlsrvConn( $conn )
+	{
+		$conn = sqlsrv_connect($conn['hostname'],[
+			'Database'     => $conn['database'],
+			'UID'          => $conn['username'],
+			'PWD'          => $conn['password'],
+			'CharacterSet' => 'UTF-8'
+		]);
+
+		if( $conn === false ){
+			throw new \app\common\exception\SgException(['msg'=>'数据库链接不可用,请检查是否开机']);
+		}
+
+		return $conn;
+	}
 }

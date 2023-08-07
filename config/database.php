@@ -26,7 +26,7 @@ return [
     'dsn'             => 'sqlsrv:Server=LDWIN10\LDWIN102008,1434;Database=cpmsdbfh',*///erpvdh
     'type'            => 'sqlsrv',
     // 服务器地址
-    'hostname'        => 'localhost',//192.168.1.102
+    'hostname'        => '.\MWJ',//192.168.1.102
     // 数据库名
     'database'        => 'cimbdv4.1',//erpv3order erpvdh erpv3temp erpv3rc
     // 用户名

@@ -181,6 +181,9 @@ class SelectController extends Controller
 				if( isset($value['finish_time']) && $value['finish_time'] ){
 					$data[$key]['pre_finishtime'] = date('Y-m-d H:i:s',strtotime($value['finish_time']));
 				}
+				if( isset($value['customer_name']) && $value['customer_name'] ){
+					$data[$key]['company_name'] = $value['customer_name'];
+				}
 			}
 			if( 2 === $size ){
 				foreach ($data as $key => $value) {
@@ -213,7 +216,7 @@ class SelectController extends Controller
 		}
 		if('2' !== $this->request->info['root']){
 			if( isset($data['scdd_company_name']) && !empty($data['scdd_company_name']) ){
-				$condition[] = ['company_name','like','%' . $data['scdd_company_name'] . '%'];
+				$condition[] = ['customer_name','like','%' . $data['scdd_company_name'] . '%'];
 			}
 		}
 		$field = 1 === config('app.db_config')[$data['scdd_config_index']]['isnew'] ? 'paper_code' : 'paper';
@@ -317,11 +320,11 @@ class SelectController extends Controller
 			$condition[] = ['width','=',$data['wgdd_width']];
 		}
 		if( isset($data['wgdd_begin_time']) && !empty($data['wgdd_begin_time']) && isset($data['wgdd_end_time']) && !empty($data['wgdd_end_time']) ){
-			$condition[] = ['finish_date','between',[$data['wgdd_begin_time'],$data['wgdd_end_time']]];
+			$condition[] = ['finish_date','between',[$data['wgdd_begin_time'] . ' 00:00:00',$data['wgdd_end_time'] . ' 23:59:59']];
 		}elseif( isset($data['wgdd_begin_time']) && !empty($data['wgdd_begin_time']) ){
-			$condition[] = ['finish_date','>=',$data['wgdd_begin_time'] ];
+			$condition[] = ['finish_date','>=',$data['wgdd_begin_time'] . ' 00:00:00' ];
 		}elseif( isset($data['wgdd_end_time']) && !empty($data['wgdd_end_time']) ){
-			$condition[] = ['finish_date','<=',$data['wgdd_end_time'] ];
+			$condition[] = ['finish_date','<=',$data['wgdd_end_time']  . ' 23:59:59' ];
 		}
 		return $condition;
 	}

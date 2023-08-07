@@ -10,7 +10,7 @@ class One extends Controller
 
     public function index(Core $core)
     {
-        $core->index($this->config_index);
+    	$core->index($this->config_index);
     }
 
 }
