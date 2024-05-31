@@ -11,7 +11,7 @@ class AnalyzeData
 	public static function analyzeUdp( $config_index, $buf = NULL )
 	{
 		$config = Config::get('app.db_config')[$config_index];
-		var_dump($_SERVER['SERVER_ADDR']);die;
+		//var_dump($_SERVER['SERVER_ADDR']);die;
 		try {
 			if( $config['DB_DATA'] == '0' ){
 				$socket = socket_create(AF_INET,SOCK_DGRAM,SOL_UDP);
