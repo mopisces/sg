@@ -18,7 +18,8 @@ class StatisController extends Controller
 				$all_isnew = 1;
 			}
 		}
-		$result['line'][0] = ['text'=>'全部','value'=>'ALL', 'isnew'=>$all_isnew];
+
+		$result['line'][0] = ['text'=>$this->request->lang['all'],'value'=>'ALL', 'isnew'=>$all_isnew];
 		foreach ( config('app.db_config') as $key => $value) {
 			$result['line'][$key + 1]['text'] = $value['DB_FLAG'];
 			$result['line'][$key + 1]['value'] = $key;
@@ -30,7 +31,7 @@ class StatisController extends Controller
 			'beginDate' => date('Y-m-d',strtotime('-1 year')),
 			'endDate'   => date('Y-m-d'),
 		];
-		return ['errorCode'=>'00000','msg'=>'返回成功','result'=>$result];
+		return ['errorCode'=>'00000','msg'=>$this->request->lang['return'] . $this->request->lang['success'],'result'=>$result];
 	}
  
 	/**
@@ -143,7 +144,7 @@ class StatisController extends Controller
 				$final = $this->getSqlData(util::getConnect( config('app.db_config')[$data['line']] ),  $data );
 			}
 		}
-		return ['errorCode'=>'00000','msg'=>'返回成功','result'=>$final];
+		return ['errorCode'=>'00000','msg'=>$this->request->lang['return'] . $this->request->lang['success'],'result'=>$final];
 	}
 
 	protected function getSqlData( $connect, $data )

@@ -21,12 +21,14 @@ class AlterController extends Controller
 				->field('ParameterValue')
 				->find();
 			} catch ( \Exception $e ) {
-				throw new \app\common\exception\SgException(['msg'=>'SysConfiguration 表数据获取失败']);
+				throw new \app\common\exception\SgException([
+					'msg'=>'SysConfiguration'.$this->request->lang['table'].$this->request->lang['fetch'].$this->request->lang['fail']
+				]);
 			}
 			if( NULL === $result ){
-				throw new \app\common\exception\SgException(['msg'=>'SysConfiguration 表没有对应参数']);
+				throw new \app\common\exception\SgException(['msg'=>'SysConfiguration '.$this->request->lang['table'].$this->request->lang['fetch'].$this->request->lang['fail']]);
 			}
-			return ['errorCode'=>'00000','msg'=>'返回成功','result'=>$result['ParameterValue'] ];
+			return ['errorCode'=>'00000','msg'=> $this->request->lang['return'] . $this->request->lang['success'],'result'=>$result['ParameterValue'] ];
 		}else{
 			$field = '1' == config('db_config')[$this->request->post('alter_config_index')]['updown'] ? 'prodlenm' : 'lenmm';
 			try {
@@ -36,12 +38,12 @@ class AlterController extends Controller
 				->order('id','desc')
 				->find();
 			} catch ( \Exception $e ) {
-				throw new \app\common\exception\SgException(['msg'=>'finish 表数据获取失败']);
+				throw new \app\common\exception\SgException(['msg'=>'finish '.$this->request->lang['table'].$this->request->lang['fetch'].$this->request->lang['fail']]);
 			}
 			if( NULL === $result ){
-				throw new \app\common\exception\SgException(['msg'=>'finish 表没有对应参数']);
+				throw new \app\common\exception\SgException(['msg'=>'finish '.$this->request->lang['table'].$this->request->lang['noData']]);
 			}
-			return ['errorCode'=>'00000','msg'=>'返回成功','result'=>['value'=>$result[$field],'id'=>$result['id']] ];
+			return ['errorCode'=>'00000','msg'=> $this->request->lang['return'] . $this->request->lang['success'],'result'=>['value'=>$result[$field],'id'=>$result['id']] ];
 		}
 	}
 
@@ -61,7 +63,7 @@ class AlterController extends Controller
 			->data(['ParameterValue'=>$this->request->post('change_value')])
 			->update();
 			if( 1 !== $update ){
-				throw new \app\common\exception\DataBaseException(['msg'=>'数据更新失败']);
+				throw new \app\common\exception\DataBaseException(['msg'=>$this->request->lang['update'].$this->request->lang['fail']]);
 			}
 			$result = [
 				'before' => $data['ParameterValue'],
@@ -76,7 +78,7 @@ class AlterController extends Controller
 			->field($field)
 			->find();
 			if( NULL === $data ){
-				throw new \app\common\exception\ParamsException(['msg'=>'change_id参数错误']);
+				throw new \app\common\exception\ParamsException(['msg'=>'change_id'.$this->request->lang['parameter'].$this->request->lang['error']]);
 			}
 			try {
 				$update = Db::connect($connect)
@@ -88,7 +90,7 @@ class AlterController extends Controller
 				throw new \app\common\exception\ExecException();
 			}
 			if( 1 !== $update ){
-				throw new \app\common\exception\DataBaseException(['msg'=>'数据更新失败']);
+				throw new \app\common\exception\DataBaseException(['msg'=>$this->request->lang['update'] . $this->request->lang['fail']]);
 			}
 			$result = [
 				'id'     => $this->request->post('change_id'),
@@ -100,7 +102,7 @@ class AlterController extends Controller
 		/*$record = session('record');
 		$record[ $this->request->post('change_config_index') ][] = $result;
 		session('record',$record);*/
-		return ['errorCode'=>'00000','msg'=>'更新成功','result'=>$result ];
+		return ['errorCode'=>'00000','msg'=>$this->request->lang['update'] . $this->request->lang['success'],'result'=>$result ];
 	}
 
 	public function getRecord()
@@ -113,7 +115,7 @@ class AlterController extends Controller
             [ 'id' => 2, 'before' => 2000, 'after' => 200, 'time' => date('Y-m-d H:i:s',time())  ],
             [ 'id' => 3, 'before' => 3000, 'after' => 3, 'time' => date('Y-m-d H:i:s',time())  ],
         ];*/
-		return ['errorCode'=>'00000','msg'=>'返回成功','result'=>$result];
+		return ['errorCode'=>'00000','msg'=>$this->request->lang['return'] . $this->request->lang['success'],'result'=>$result];
 	}
 
 	public function clearRecord()
@@ -122,7 +124,7 @@ class AlterController extends Controller
 		$record = session('record');
 		$record[ $this->request->post('alter_config_index') ] = NULL;
 		session('record',$record);
-		return ['errorCode'=>'00000','msg'=>'删除成功','result'=>NULL];
+		return ['errorCode'=>'00000','msg'=>$this->request->lang['delete'] . $this->request->lang['success'],'result'=>NULL];
 	}
 
 }

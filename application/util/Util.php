@@ -54,4 +54,14 @@ class Util
 
 		return $conn;
 	}
+
+	public function getLanguage($language="zh") 
+	{
+		$langFile = __DIR__ . '/../lang/' . $language . '.php';
+		if (file_exists($langFile)) {
+			return include $langFile;
+		} else {
+			return include __DIR__ . '/../lang/zh.php';
+		}
+	}
 }

@@ -22,7 +22,7 @@ class UserController extends Controller
 		->where('user', '<>', $this->request->info['user'])
 		->field('id,user,pass')
 		->select();
-		return ['errorCode'=>'00000','msg'=>'返回成功','result'=>$result];
+		return ['errorCode'=>'00000','msg'=>$this->request->lang['return'] . $this->request->lang['success'],'result'=>$result];
 	}
 
 	public function doEdit()
@@ -46,7 +46,7 @@ class UserController extends Controller
 			->update(['user'=>$this->request->post('user'),'pass'=>$this->request->post('pass')]);
 		}
 		if( $result ){
-			return ['errorCode'=>'00000','msg'=>'操作成功！','result'=>NULL];
+			return ['errorCode'=>'00000','msg'=>$this->request->lang['opreate'] . $this->request->lang['success'],'result'=>NULL];
 		}
 	}
 
@@ -60,7 +60,7 @@ class UserController extends Controller
 		])
 		->update(['status' => $this->request->post('status')]);
 		if( $result ){
-			return ['errorCode'=>'00000','msg'=>'操作成功！','result'=>NULL];
+			return ['errorCode'=>'00000','msg'=>$this->request->lang['opreate'] . $this->request->lang['success'],'result'=>NULL];
 		}
 	}
 }

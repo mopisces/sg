@@ -14,7 +14,12 @@ class SelectController extends Controller
 
 	public function getConfig()
 	{
-		return ['errorCode'=>'00000','msg'=>'返回成功','result'=>config('db_config'), 'weight' => $this->openWeightBl];
+		return [
+			'errorCode'=>'00000',
+			'msg'=> $this->request->lang['return'] . $this->request->lang['success'],
+			'result'=>config('db_config'), 
+			'weight' => $this->openWeightBl
+		];
 	}
 
 	public function getBl()
@@ -30,10 +35,12 @@ class SelectController extends Controller
 			$result = Db::connect($connect)
 			->query('exec P_GetPrePaperTotal '. $table_name . ',\'\'' )[0];
 		} catch ( \Exception $e ) {
-			throw new \app\common\exception\SgException(['msg'=>'备料模块数据获取失败']);
+			throw new \app\common\exception\SgException([
+				'msg'=>$this->request->lang['data'].$this->request->lang['fetch'].$this->request->lang['fail']
+			]);
 			
 		}
-		return ['errorCode'=>'00000','msg'=>'返回成功','result'=>$result];
+		return ['errorCode'=>'00000','msg'=> $this->request->lang['return'] . $this->request->lang['success'],'result'=>$result];
 	}
 
 	public function getBlms()
@@ -54,7 +61,9 @@ class SelectController extends Controller
 			->select();
 			$flute = Db::connect($connect)->query('exec P_GetFlute')[0];
 		} catch ( \Exception $e ) {
-			throw new \app\common\exception\SgException(['msg'=>'备料米数模块数据获取失败']);
+			throw new \app\common\exception\SgException([
+				'msg'=>$this->request->lang['data'].$this->request->lang['fetch'].$this->request->lang['fail']
+			]);
 		}
 		$ceng_info = ['糊机备纸','SF1芯纸','SF1面纸','SF2芯纸','SF2面纸','SF3芯纸','SF3面纸'];
 		if( 1 === $config['updown'] ){
@@ -131,7 +140,7 @@ class SelectController extends Controller
 			$table_data[ $i ] = $table_data_son;
 		}
 		
-		return ['errorCode'=>'00000','msg'=>'返回成功','result'=>$table_data];
+		return ['errorCode'=>'00000','msg'=> $this->request->lang['return'] . $this->request->lang['success'],'result'=>$table_data];
 	}
 
 	protected function getBlmsWeight( $connect )
@@ -139,10 +148,10 @@ class SelectController extends Controller
 		try {
 			$data = Db::connect($connect)->exec('exec p_GetPaperWetOrLenth ');
 		} catch ( \Exception $e) {
-			throw new \app\common\exception\SgException(['msg' => '按克重获取数据失败']);
+			throw new \app\common\exception\SgException(['msg' => $this->request->lang['data'].$this->request->lang['fetch'].$this->request->lang['fail']]);
 		}
 		if( NULL === $data ){
-			throw new \app\common\exception\SgException(['msg' => '按克重暂无数据']);
+			throw new \app\common\exception\SgException(['msg' => $this->request->lang['data'].$this->request->lang['fetch'].$this->request->lang['fail']]);
 		}
 		$result = [];
 		foreach ($data as $key => $value) {
@@ -154,7 +163,7 @@ class SelectController extends Controller
            	$result[$key]['SF3芯纸']  = $value['layer6'];
            	$result[$key]['SF3面纸']  = $value['layer7'];
 		}
-		return ['errorCode'=>'00000','msg'=>'返回成功','result'=>$result];
+		return ['errorCode'=>'00000','msg'=> $this->request->lang['return'] . $this->request->lang['success'],'result'=>$result];
 	}
 
 	public function getScdd()
@@ -162,14 +171,14 @@ class SelectController extends Controller
 		$this->validate( $this->request->post(),'app\sg\validate\SelectValidate.getScdd' );
 		$condition = $this->getConditionScdd($this->request->post());
 		$connect = util::getConnect( config('app.db_config')[$this->request->post('scdd_config_index')] );
-		$count = Db::connect($connect)->table('view_myorder')->where($condition)->count();
+		$count = Db::connect($connect)->table('view_prefinish')->where($condition)->count();
 		$size = 1 === config('app.db_config')[$this->request->post('scdd_config_index')]['updown'] ? 2:1;
 		$data = [];
 		$info = [];
 		$result = [];
 		if( 0 != $count ){
 			$data = Db::connect($connect)
-			->table('view_myorder')
+			->table('view_prefinish')
 			->where($condition)
 			->order('sn,tag','desc')
 			->page($this->request->post('cur_page'),$this->scddPageSize * $size )
@@ -202,7 +211,7 @@ class SelectController extends Controller
 				$result = $data;
 			}
 		}
-		return ['errorCode'=>'00000','msg'=>'返回成功','result'=>$result];
+		return ['errorCode'=>'00000','msg'=>$this->request->lang['return'] . $this->request->lang['success'],'result'=>$result];
 	}
 
 	protected function getConditionScdd( $data )
@@ -244,7 +253,7 @@ class SelectController extends Controller
 			'beginDate' => date('Y-m-d',strtotime('now')),
 			'endDate'   => date('Y-m-d',strtotime('+1 day')),
 		];
-		return ['errorCode'=>'00000','msg'=>'返回成功','result'=>$result];
+		return ['errorCode'=>'00000','msg'=>$this->request->lang['return'] . $this->request->lang['success'],'result'=>$result];
 	}
 
 	public function getWgdd()
@@ -260,7 +269,7 @@ class SelectController extends Controller
 		->page( $this->request->post('cur_page'), $this->wgddPageSize * $size )
 		->select();
 		if( NULL === $data || [] === $data ){
-			throw new \app\common\exception\SgException(['msg'=>'完工订单模块数据获取失败']);
+			throw new \app\common\exception\SgException(['msg'=> $this->request->lang['data'].$this->request->lang['fetch'].$this->request->lang['fail']]);
 		}
 		$data = array_map(function($item){
 			if( $item['start_time'] ){
@@ -288,7 +297,7 @@ class SelectController extends Controller
 		}else{
 			$return = $data;
 		}
-		return ['errorCode'=>'00000','msg'=>'返回成功','result'=>$return ];
+		return ['errorCode'=>'00000','msg'=>$this->request->lang['return'] . $this->request->lang['success'],'result'=>$return ];
 	}
 
 	protected function 	getConditionWgdd( $data )
