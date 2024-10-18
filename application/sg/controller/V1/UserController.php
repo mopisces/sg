@@ -18,7 +18,7 @@ class UserController extends Controller
 	public function fetchList()
 	{
 		$result = Db::table('W_UserTable')
-		->where(['flag' => $this->request->info['root'],'status' => 1])
+		->where(['flag' => $this->request->info['root']])
 		->where('user', '<>', $this->request->info['user'])
 		->field('id,user,pass')
 		->select();
@@ -46,7 +46,7 @@ class UserController extends Controller
 			->update(['user'=>$this->request->post('user'),'pass'=>$this->request->post('pass')]);
 		}
 		if( $result ){
-			return ['errorCode'=>'00000','msg'=>$this->request->lang['opreate'] . $this->request->lang['success'],'result'=>NULL];
+			return ['errorCode'=>'00000','msg'=>$this->request->lang['operate'] . $this->request->lang['success'],'result'=>NULL];
 		}
 	}
 
@@ -58,9 +58,9 @@ class UserController extends Controller
 			'id'=>$this->request->post('id'),
 			'flag' => $this->request->info['root']
 		])
-		->update(['status' => $this->request->post('status')]);
+		->delete();
 		if( $result ){
-			return ['errorCode'=>'00000','msg'=>$this->request->lang['opreate'] . $this->request->lang['success'],'result'=>NULL];
+			return ['errorCode'=>'00000','msg'=>$this->request->lang['operate'] . $this->request->lang['success'],'result'=>NULL];
 		}
 	}
 }
