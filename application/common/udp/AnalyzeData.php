@@ -60,11 +60,11 @@ class AnalyzeData
 	{
 		$result = [
 			'class'  => self::getClass($config, $buf),//chr($buf[709]),
-			'qds1'   => self::byteToInt($buf,53),
-			'scds1'  => self::byteToInt($buf,17),
-			'syds1'  => self::byteToInt($buf,21),
-			'ddsy1'  => round(self::byteToInt($buf,33)/1000,0),
-			'blds1'  => self::byteToInt($buf,25),
+			'qds'   => self::byteToInt($buf,53),
+			'scds'  => self::byteToInt($buf,17),
+			'syds'  => self::byteToInt($buf,21),
+			'ddsy'  => round(self::byteToInt($buf,33)/1000,0),
+			'blds'  => self::byteToInt($buf,25),
 			'ddc'    => round(self::byteToInt($buf,61)/1000,0),
 			'qc'     => self::byteToInt($buf,57),
 			'qds2'   => self::byteToInt($buf,105),
@@ -126,6 +126,7 @@ class AnalyzeData
 
 	protected static function getNewNotUpdown( $buf, $config )
 	{
+		$areaInfo = self::getAreaInfo($config);
 		$result = [
 			'class'  => self::getClass($config, $buf),//chr($buf[709]),
 			'qds'    => self::byteToInt($buf,53),
@@ -149,6 +150,7 @@ class AnalyzeData
 				'scjpf' => self::byteToInt($buf,169),
 				'hzl'   => self::byteToInt($buf,181)/100,
 				'xbl'   => self::byteToInt($buf,185)/100,
+				'zmj'   => $areaInfo['totalCombinedArea'],
 			],
 			'benbi'  => [
 				'zms'   => self::byteToInt($buf,205),
@@ -163,6 +165,7 @@ class AnalyzeData
 				'scjpf' => self::byteToInt($buf,225),
 				'hzl'   => self::byteToInt($buf,237)/100,
 				'xbl'   => self::byteToInt($buf,241)/100,
+				'zmj'   => $areaInfo['benbiArea'],
 			],
 			'huji' => [
 				'cs' => self::byteToInt($buf,265),
@@ -192,13 +195,13 @@ class AnalyzeData
 	{
 		$result = [
 			'class'  => chr($buf[strlen($config['socket_bind']['flag']) + 1]),
-			'qds1'   => self::byteToInt($buf,31),
-			'scds1'  => self::byteToInt($buf,35),
-			'syds1'  => self::byteToInt($buf,39),
-			'ddsy1'  => self::byteToInt($buf,43),
-			'blds1'  => self::byteToInt($buf,47),
-			'ddc1'   => self::byteToInt($buf,51),
-			'qc1'    => self::byteToInt($buf,55),
+			'qds'   => self::byteToInt($buf,31),
+			'scds'  => self::byteToInt($buf,35),
+			'syds'  => self::byteToInt($buf,39),
+			'ddsy'  => self::byteToInt($buf,43),
+			'blds'  => self::byteToInt($buf,47),
+			'ddc'   => self::byteToInt($buf,51),
+			'qc'    => self::byteToInt($buf,55),
 			'qds2'   => self::byteToInt($buf,59),
 			'scds2'  => self::byteToInt($buf,63),
 			'syds2'  => self::byteToInt($buf,67),
@@ -319,10 +322,10 @@ class AnalyzeData
 	{
 		if( self::$isFromDb ){
 			$conn = sqlsrv_connect($config['DB_HOST'],[
-                'Database'     => $config['DB_NAME'],
-                'UID'          => $config['DB_USER'],
-                'PWD'          => $config['DB_PWD'],
-                'CharacterSet' => 'UTF-8'
+                'Database'=> $config['DB_NAME'],
+                'UID'=> $config['DB_USER'],
+                'PWD'=> $config['DB_PWD'],
+                'CharacterSet'=> 'UTF-8'
             ]);
 			try {
 				$stmt = sqlsrv_query( $conn, 'SELECT new_shift FROM ShiftLog WHERE id = ( SELECT max(id) From ShiftLog )' );
@@ -340,4 +343,34 @@ class AnalyzeData
 		return $class;
 	}
 
+	protected static function getAreaInfo( $config ) 
+	{
+		$conn = sqlsrv_connect($config['DB_HOST'],[
+            'Database'=> $config['DB_NAME'],
+            'UID'=> $config['DB_USER'],
+            'PWD'=> $config['DB_PWD'],
+            'CharacterSet'=> 'UTF-8'
+        ]);
+        $areaInfo = ['totalCombinedArea'=> 0, 'benbiArea'=> 0];
+       	try {
+       		// 判断存储过程是否存在
+	        $query = "SELECT COUNT(*) AS exists_count FROM INFORMATION_SCHEMA.ROUTINES WHERE ROUTINE_TYPE = 'PROCEDURE' AND ROUTINE_NAME = ?";
+	        $stmt = sqlsrv_prepare($conn, $query, array('P_GetAreaInfo'));
+	        if ($stmt !== false) {
+	        	sqlsrv_execute($stmt);
+	        	$result = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
+	        	if ($result['exists_count'] > 0) {
+	        		$stmt = sqlsrv_query( $conn, 'EXEC P_GetAreaInfo' );
+	        		if( $stmt !== false ) {
+	        			$areaInfo = sqlsrv_fetch_array( $stmt, SQLSRV_FETCH_ASSOC);
+	        			sqlsrv_free_stmt($stmt);
+	           			sqlsrv_close($conn);
+	        		}
+	        	}
+	        }
+		} catch ( \Exception $e) {
+			return $areaInfo;
+		}
+		return $areaInfo;
+	}
 }

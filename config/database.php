@@ -11,24 +11,11 @@
 
 return [
     // 数据库类型
-   /* 'type'            => 'sqlsrv',
-    // 服务器地址
-    'hostname'        => '192.168.1.209',
-    // 数据库名
-    'database'        => 'cpmsdbfh',
-    // 用户名
-    'username'        => 'sa',
-    // 密码
-    'password'        => 'sakey',
-    // 端口
-    'hostport'        => '1434',
-    // 连接dsn
-    'dsn'             => 'sqlsrv:Server=LDWIN10\LDWIN102008,1434;Database=cpmsdbfh',*///erpvdh
     'type'            => 'sqlsrv',
     // 服务器地址
-    'hostname'        => '.\MWJ',//192.168.1.102
+    'hostname'        => 'LEAPER-PC\MWJ',//192.168.1.102
     // 数据库名
-    'database'        => 'cimbdv4.1',//erpv3order erpvdh erpv3temp erpv3rc
+    'database'        => 'cpmsdbv4.5',//erpv3order erpvdh erpv3temp erpv3rc
     // 用户名
     'username'        => 'sa',
     // 密码
@@ -36,7 +23,7 @@ return [
     // 端口
     'hostport'        => '1433',
     // 连接dsn
-    'dsn'             => 'sqlsrv:Server=.\MWJ;Database=cimbdv4.1',
+    'dsn'             => 'sqlsrv:Server=LEAPER-PC\MWJ;Database=cpmsdbv4.5',
     // 数据库连接参数
     'params'          => [],
     // 数据库编码默认采用utf8
