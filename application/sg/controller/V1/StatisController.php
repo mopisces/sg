@@ -174,4 +174,299 @@ class StatisController extends Controller
 		}
 		return $result;
 	}
+
+	public function fetchPaperFinishList() 
+	{
+		$data = $this->request->post();
+		$this->validate( $data, 'app\sg\validate\StatisValidate.paperFinish' );
+		$strWhere = "";
+		if( isset($data["companyName"]) && !empty($data["companyName"]) ) {
+			$strWhere .=  " AND customer_name=''".$data['companyName']."''";
+		}
+		if( isset($data["className"]) && !empty($data["className"]) ) {
+			$strWhere .=  " AND shift_code=''".$data['className']."''";
+		}
+		if( isset($data["width"]) && !empty($data["width"]) ) {
+			$strWhere .=  " AND width=''".$data['width']."''";
+		}
+
+
+		if( isset($data["bdL"]) && !empty($data["bdL"]) ) {
+			$strWhere .=  " AND paper_len=''".$data['bdL']."''";
+		}
+		if( isset($data["bdW"]) && !empty($data["bdW"]) ) {
+			$strWhere .=  " AND paper_w=''".$data['bdW']."''";
+		}
+		if( isset($data["fluteType"]) && !empty($data["fluteType"]) ) {
+			$strWhere .=  " AND flute_type=''".$data['width']."''";
+		}
+		if( isset($data["paperCode"]) && !empty($data["paperCode"]) ) {
+			$strWhere .=  " AND paper_code''".$data['paperCode']."''";
+		}
+
+		/*$data['beginDate'] = '2024-11-01';
+		$data['endDate'] = '2024-11-28';*/
+
+		if( $data["orderSource"] == 2 ) {
+			$strWhere .= " AND order_source = ''车间'' ";
+		}
+		if( $data["orderSource"] == 3 ) {
+			$strWhere .= " AND order_source = ''ERP'' ";
+		}
+
+		$sql = "exec  p_get_finishreport  ".$data['dataType'].", '".$strWhere." AND finish_date between ''".$data['beginDate']." 00:00:00'' AND '' ".$data['endDate']." 23:59:59''','order by SUMType' ";
+
+		$connect = util::getConnect( config('app.db_config')[$data["lineNum"]] );
+
+		$countRow = [
+			"SUMType"=> $this->request->lang['sum'],
+			"cutting_qty"=> 0,
+			"cutting_waste_qty"=> 0,
+			"good_len"=> 0,
+			"bad_len"=> 0,
+			"prod_len"=> 0,
+			"total_len"=> 0,
+			"good_sqm"=> 0,
+			"bad_sqm"=> 0,
+			"prod_sqm"=> 0,
+			"trim_sqm"=> 0,
+			"total_sqm"=> 0,
+			"bad_rate"=> 0,
+			"trim_rate"=> 0,
+			"work_time_str"=> 0,
+			"stop_time_str"=> 0,
+			"stops"=> 0
+		];
+		try {
+			$list = Db::connect($connect)->query($sql)[0];
+			if( count($list) > 0 ) {
+				// 删除多余的时间行
+				$filteredArray = array_filter($list, function($subArray) {
+				    return count($subArray) >= 1;
+				});
+				$list = array_values($filteredArray);
+
+				// 不保留小数
+				$roundField = [
+					"good_len",
+					"bad_len",
+					"prod_len",
+					"total_len",
+
+					"good_sqm",
+					"bad_sqm",
+					"prod_sqm",
+					"trim_sqm",
+					"total_sqm",
+				];
+
+				// 保留两位小数
+				$roundField2 = [
+					"bad_rate",
+					"trim_rate"
+				];
+
+				foreach( $list as $key=> $value ) {
+					foreach( $value as $idx=> $item ) {
+						if( isset($countRow[$idx]) && !in_array($idx, ["work_time_str", "stop_time_str", "bad_rate", "trim_rate", "SUMType"]) ) {
+							$countRow[$idx] += $item;
+						}
+						if( in_array($idx, $roundField) ) {
+							$list[$key][$idx] = (int)round($item);
+						}
+						if( in_array($idx, $roundField2) ) {
+							$list[$key][$idx] = round($item, 2);
+						}
+
+					}
+
+					$countRow["work_time_str"] += $value["work_time"];
+					$countRow["stop_time_str"] += $value["stop_time"];
+				}
+			}
+
+			foreach( $countRow as $key=> $value ) {
+				if( in_array($key, $roundField) ) {
+					$countRow[$key] = (int)round($value);
+				}
+			}
+			$countRow["bad_rate"] = round( $countRow["bad_sqm"] / $countRow["total_sqm"] * 100, 2 );
+			$countRow["trim_rate"] = round( $countRow["trim_sqm"] / $countRow["total_sqm"] * 100, 2 );
+			$countRow["avg_speed"] = ceil($countRow["good_len"] / ( $countRow["work_time_str"] + $countRow["stop_time_str"] ) * 600) / 10;
+			$countRow["work_time_str"] = util::formatSeconds($countRow["work_time_str"]);
+			$countRow["stop_time_str"] = util::formatSeconds($countRow["stop_time_str"]);
+			array_push($list, $countRow);
+			return ['errorCode'=>'00000','msg'=>$this->request->lang['return'] . $this->request->lang['success'], 'result'=> $list];
+		} catch(\Exception $e) {
+			
+			throw new \app\common\exception\SgException(['msg'=> $this->request->lang['fail']]);
+		}
+		
+	}
+
+
+	public function fetchPaperFinishAnalysisData() 
+	{
+		$data = $this->request->post();
+		$this->validate( $data, 'app\sg\validate\StatisValidate.paperFinishAnalysis' );
+
+		$strWhere = "";
+		if( isset($data["companyName"]) && !empty($data["companyName"]) ) {
+			$strWhere .=  " AND customer_name=''".$data['companyName']."''";
+		}
+		if( isset($data["className"]) && !empty($data["className"]) ) {
+			$strWhere .=  " AND shift_code=''".$data['className']."''";
+		}
+		if( isset($data["width"]) && !empty($data["width"]) ) {
+			$strWhere .=  " AND width=''".$data['width']."''";
+		}
+		if( isset($data["bdL"]) && !empty($data["bdL"]) ) {
+			$strWhere .=  " AND paper_len=''".$data['bdL']."''";
+		}
+		if( isset($data["bdW"]) && !empty($data["bdW"]) ) {
+			$strWhere .=  " AND paper_w=''".$data['bdW']."''";
+		}
+		if( isset($data["fluteType"]) && !empty($data["fluteType"]) ) {
+			$strWhere .=  " AND flute_type=''".$data['width']."''";
+		}
+		if( isset($data["paperCode"]) && !empty($data["paperCode"]) ) {
+			$strWhere .=  " AND paper_code''".$data['paperCode']."''";
+		}
+
+		if( $data["orderSource"] == 2 ) {
+			$strWhere .= " AND order_source = ''车间'' ";
+		}
+		if( $data["orderSource"] == 3 ) {
+			$strWhere .= " AND order_source = ''ERP'' ";
+		}
+
+		/*$data['beginDate'] = '2024-11-01';
+		$data['endDate'] = '2024-11-30';*/
+
+		$sql = "exec p_get_finishanalysisreport 2, '".$strWhere." AND finish_date between ''".$data['beginDate']." 00:00:00'' AND ''".$data['endDate']." 23:59:59''', ''";
+
+		$connect = util::getConnect( config('app.db_config')[$data["lineNum"]] );
+
+		try {
+			$list = Db::connect($connect)->query($sql);
+			$timeRange = "";
+			$resp = [
+				"timeRange"=> "",
+				"prodInfo"=> [],
+				"machineList"=> [],
+			];
+			if( count($list) > 0 ) {
+				// 生产信息汇总
+				// 第一行
+				$resp["prodInfo"][0]["col1_value"] = $list[0][0]["work_time"];
+				$resp["prodInfo"][0]["col1_read"] = $this->request->lang["workTime"];
+				$resp["prodInfo"][0]["col2_value"] = $list[0][0]["total_len"];
+				$resp["prodInfo"][0]["col2_read"] = $this->request->lang["totalLen"];
+				$resp["prodInfo"][0]["col3_value"] = $list[0][0]["total_sqm"];
+				$resp["prodInfo"][0]["col3_read"] = $this->request->lang["totalSqm"];
+				$resp["prodInfo"][0]["col4_value"] = $list[0][0]["total_wt"];
+				$resp["prodInfo"][0]["col4_read"] = $this->request->lang["totalWT"];
+				// 第二行
+				$resp["prodInfo"][1]["col1_value"] = $list[0][0]["stop_time"];
+				$resp["prodInfo"][1]["col1_read"] = $this->request->lang["stopTime"];
+				$resp["prodInfo"][1]["col2_value"] = $list[0][0]["good_len"];
+				$resp["prodInfo"][1]["col2_read"] = $this->request->lang["goodLen"];
+				$resp["prodInfo"][1]["col3_value"] = $list[0][0]["good_sqm"];
+				$resp["prodInfo"][1]["col3_read"] = $this->request->lang["goodSqm"];
+				$resp["prodInfo"][1]["col4_value"] = $list[0][0]["good_wt"];
+				$resp["prodInfo"][1]["col4_read"] = $this->request->lang["goodWT"];
+				// 第三行
+				$resp["prodInfo"][2]["col1_value"] = $list[0][0]["stops"];
+				$resp["prodInfo"][2]["col1_read"] = $this->request->lang["stops"];
+				$resp["prodInfo"][2]["col2_value"] = $list[0][0]["bad_len"];
+				$resp["prodInfo"][2]["col2_read"] = $this->request->lang["badLen"];
+				$resp["prodInfo"][2]["col3_value"] = $list[0][0]["bad_sqm"];
+				$resp["prodInfo"][2]["col3_read"] = $this->request->lang["badSqm"];
+				$resp["prodInfo"][2]["col4_value"] = $list[0][0]["bad_wt"];
+				$resp["prodInfo"][2]["col4_read"] = $this->request->lang["badWT"];
+				$resp["prodInfo"][2]["col5_value"] = sprintf("%.2f", $list[0][0]["bad_rate"]);
+				$resp["prodInfo"][2]["col5_read"] = $this->request->lang["badRate"];
+				// 第四行
+				$resp["prodInfo"][3]["col1_value"] = $list[0][0]["avg_speed"];
+				$resp["prodInfo"][3]["col1_read"] = $this->request->lang["avgSpeed"];
+				$resp["prodInfo"][3]["col2_value"] = $list[0][0]["cutting_qty"];
+				$resp["prodInfo"][3]["col2_read"] = $this->request->lang["cuttingQty"];
+				$resp["prodInfo"][3]["col3_value"] = $list[0][0]["trim_sqm"];
+				$resp["prodInfo"][3]["col3_read"] = $this->request->lang["trimSqm"];
+				$resp["prodInfo"][3]["col4_value"] = $list[0][0]["trim_wt"];
+				$resp["prodInfo"][3]["col4_read"] = $this->request->lang["trimWT"];
+				$resp["prodInfo"][3]["col5_value"] = sprintf("%.2f", $list[0][0]["trim_rate"]);
+				$resp["prodInfo"][3]["col5_read"] = $this->request->lang["trimRate"];
+				// 第五行
+				$resp["prodInfo"][4]["col1_value"] = $list[0][0]["avg_width"];
+				$resp["prodInfo"][4]["col1_read"] = $this->request->lang["avgWidth"];
+				$resp["prodInfo"][4]["col2_value"] = $list[0][0]["shift_cutting_waste_qty"];
+				$resp["prodInfo"][4]["col2_read"] = $this->request->lang["shiftCuttingWasteQty"];
+				$resp["prodInfo"][4]["col3_value"] = $list[0][0]["shift_cutting_waste_sqm"];
+				$resp["prodInfo"][4]["col3_read"] = $this->request->lang["shiftCuttingWasteSqm"];
+				$resp["prodInfo"][4]["col4_value"] = $list[0][0]["shift_cutting_waste_wt"];
+				$resp["prodInfo"][4]["col4_read"] = $this->request->lang["shiftCuttingWasteWT"];
+				$resp["prodInfo"][4]["col5_value"] = sprintf("%.2f", $list[0][0]["shift_cutting_waste_rate"]);
+				$resp["prodInfo"][4]["col5_read"] = $this->request->lang["shiftCuttingWasteRate"];
+				// 第六行
+				$resp["prodInfo"][5]["col1_value"] = $list[0][0]["order_count"];
+				$resp["prodInfo"][5]["col1_read"] = $this->request->lang["orderCount"];
+				$resp["prodInfo"][5]["col2_value"] = $list[0][0]["cutting_waste_qty"];
+				$resp["prodInfo"][5]["col2_read"] = $this->request->lang["cuttingWasteQty"];
+				$resp["prodInfo"][5]["col3_value"] = $list[0][0]["cutting_waste_sqm"];
+				$resp["prodInfo"][5]["col3_read"] = $this->request->lang["cuttingWasteSqm"];
+				$resp["prodInfo"][5]["col4_value"] = $list[0][0]["cutting_waste_wt"];
+				$resp["prodInfo"][5]["col4_read"] = $this->request->lang["cuttingWasteWT"];
+				$resp["prodInfo"][5]["col5_value"] = sprintf("%.2f", $list[0][0]["cutting_waste_rate"]);
+				$resp["prodInfo"][5]["col5_read"] = $this->request->lang["cuttingWasteRate"];
+				// 第七行
+				$resp["prodInfo"][6]["col1_value"] = $list[0][0]["avg_len"];
+				$resp["prodInfo"][6]["col1_read"] = $this->request->lang["avgLen"];
+				$resp["prodInfo"][6]["col2_value"] = util::countFluteTimes($list[0][0]["fluteStr"]);
+				$resp["prodInfo"][6]["col2_read"] = $this->request->lang["fluteTimes"];
+				$resp["prodInfo"][6]["col3_value"] = $list[0][0]["total_waste_sqm"];
+				$resp["prodInfo"][6]["col3_read"] = $this->request->lang["totalWasteSqm"];
+				$resp["prodInfo"][6]["col4_value"] = $list[0][0]["total_waste_wt"];
+				$resp["prodInfo"][6]["col4_read"] = $this->request->lang["totalWasteWT"];
+				$resp["prodInfo"][6]["col5_value"] = sprintf("%.2f", $list[0][0]["total_waste_rate"]);
+				$resp["prodInfo"][6]["col5_read"] = $this->request->lang["totalWasteRate"];
+
+				// 生产机台数据分析
+				$resp["machineList"] = $list[1];
+
+				$conutMachine =[
+					"total_sqm"=> 0,
+					"actual_sqm"=> 0,
+					"waste_sqm"=> 0,
+					"total_wt"=> 0,
+					"actual_wt"=> 0,
+					"waste_wt"=> 0,
+				];
+
+				foreach( $resp["machineList"] as $key=> $value ) {
+					foreach( $value as $idx=> $item ) {
+						if( isset($conutMachine[$idx]) ) {
+							$conutMachine[$idx] += $item;
+						}
+					}
+				}
+				$conutMachine["layer"] = $this->request->lang['sum'];
+				$conutMachine["waste_rate"] = $conutMachine["total_wt"] > 0 ? round($conutMachine["waste_wt"]/$conutMachine["total_wt"]*100, 2) : "0.00";
+				array_push($resp["machineList"], $conutMachine);
+
+				// 时间格式转换
+				$startTime = new \DateTime($list[2][0]["startTime"]);
+				$endTime = new \DateTime($list[3][0]["endTime"]);
+				$resp["timeRange"] = $startTime->format('Y-m-d H:i:s'). "~" . $endTime->format('Y-m-d H:i:s');
+			}
+			return ['errorCode'=>'00000','msg'=>$this->request->lang['return'] . $this->request->lang['success'], 'result'=> $resp];
+		} catch(\Exception $e) {
+			var_dump($e->getMessage());
+			throw new \app\common\exception\SgException(['msg'=> $this->request->lang['fail']]);
+		}
+
+	}
+
+
+
 }

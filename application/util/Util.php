@@ -64,4 +64,39 @@ class Util
 			return include __DIR__ . '/../lang/zh.php';
 		}
 	}
+
+	public function formatSeconds($seconds) 
+	{
+		// 计算小时数
+    	$hours = floor($seconds / 3600);
+    	// 计算剩余的秒数并转换为分钟
+	    $minutes = floor(($seconds % 3600) / 60);
+	    
+	    // 计算剩余的秒数
+	    $secs = $seconds % 60;
+	    // 使用 str_pad 函数来确保小时、分钟和秒都是两位数
+	    $formattedHours = str_pad($hours, 2, '0', STR_PAD_LEFT);
+	    $formattedMinutes = str_pad($minutes, 2, '0', STR_PAD_LEFT);
+	    $formattedSeconds = str_pad($secs, 2, '0', STR_PAD_LEFT);
+
+	    return "$formattedHours:$formattedMinutes:$formattedSeconds";
+	}
+
+
+	public function countFluteTimes( $fluteStr ) 
+	{
+		$fluteArr = explode(";", $fluteStr);
+		$count = 0;
+		for ($i=0; $i < count($fluteArr); $i++) { 
+			if( $fluteArr[$i] ) {
+				if( $i > 0 && $fluteArr[$i-1] ) {
+					if($fluteArr[$i] != $fluteArr[$i-1]) {
+						$count++;
+					}
+				}
+			}
+		}
+		return $count - 1;
+	}
+
 }

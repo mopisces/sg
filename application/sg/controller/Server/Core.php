@@ -18,7 +18,23 @@ class Core extends Controller
     {
         $this->config_index = $config_index;
         $config = config('db_config')[ $this->config_index ];
-        $this->socket = new SocketIO($config['socketio']['port']);
+
+        // 判断是否使用https
+        $useHttps = isset($config['socketio']['domain']) && stripos($config['socketio']['domain'], 'https://') === 0;
+
+        // 初始化 Socket.IO 配置
+        $socketOptions = [];
+        if ($useHttps) {
+            $socketOptions = [
+                'ssl' => [
+                    'local_cert' => '/path/to/your/cert.pem',
+                    'local_pk' => '/path/to/your/privkey.pem',
+                    'verify_peer' => false
+                ]
+            ];
+        }
+
+        $this->socket = new SocketIO($config['socketio']['port'], $socketOptions);
         $this->socket->on('workerStart', function($socket)use($config){
             Timer::add(1,function()use($config){
                 if( $config['DB_DATA'] ){
@@ -29,80 +45,80 @@ class Core extends Controller
                 var_dump($data);
                 $this->socket->emit('AnalyUdpData'.$this->config_index, $data );
             });
-            if($this->config_index == 0) {
-                Timer::add(5, function()use($config){
+            /*if($this->config_index == 0) {*/
+            Timer::add(5, function()use($config){
+                $emitStr = json_encode([
+                    'ret'=> 0,
+                    'data'=> null,
+                    'msg'=> ""
+                ]);
+                try {
+                    $conn = sqlsrv_connect($config['DB_HOST'],[
+                        'Database'=> $config['DB_NAME'],
+                        'UID'=> $config['DB_USER'],
+                        'PWD'=> $config['DB_PWD'],
+                        "CharacterSet"=> "UTF-8"
+                    ]);
+                    if( $conn === false ){
+                        return json_encode(['ret'=>0,'data'=>NULL,'msg'=>'check line status']);;
+                    }
+                    $stmt = sqlsrv_query( $conn, "SELECT TOP 20 *, ISNULL(CASE 
+                    WHEN (paper_len / 1000.0 * cutting_qty) > (paper_len2 / 1000.0 * cutting_qty2) 
+                    THEN (paper_len / 1000.0 * cutting_qty * width / 1000.0) 
+                    ELSE (paper_len2 / 1000.0 * cutting_qty2 * width / 1000.0) 
+                    END, 0) AS calc_ord_area FROM MyOrder WITH (NOLOCK) ORDER BY sn ASC" );
+                    if( $stmt === false ){
+                        return json_encode(['ret'=>0,'data'=>NULL,'msg'=>'check table proddata']);;
+                    }
+                    $areaAdd = 0;
+                    $lenAdd = 0;
+                    $startTime = '';
+                    $detail = [];
+                    $preRowEndTime = time();
+                    while ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
+                        $rowData = [];
+                        $rowData['order_date'] = $row['order_date']?$row['order_date']->format("Y-m-d H:i:s"):"";
+                        $rowData['ask_date'] = $row['ask_date']?$row['ask_date']->format("Y-m-d"):"";
+                        $rowData['order_date2'] = $row['order_date2']?$row['order_date2']->format("Y-m-d H:i:s"):"";
+                        $rowData['ask_date2'] = $row['ask_date2']?$row['ask_date2']->format("Y-m-d"):"";
+                        $rowData['first_time'] = $row['first_time']?$row['first_time']->format("Y-m-d H:i:s"):"";
+                        $rowData['last_time'] = $row['last_time']?$row['last_time']->format("Y-m-d H:i:s"):"";
+                        $rowData['start_time'] = $row['start_time']?$row['start_time']->format("H:i:s"):"";
+
+                        $mergeRow = $this->deelWithRow(array_replace($row, $rowData));
+                        $areaAdd += $mergeRow['calc_ord_area'];
+                        $lenAdd += $mergeRow['total_len'];
+                        $mergeRow['area_add_up'] = (int)$areaAdd;
+                        $mergeRow['len_add_up'] = (int)$lenAdd;
+                        $mergeRow['calc_ord_area'] = (int)$mergeRow['calc_ord_area'];
+                        // 计算预计开始和结束时间\
+                        if( $mergeRow['start_time'] ) {
+                            $mergeRow['calc_end_time'] = date('H:i:s', strtotime($mergeRow['start_time']) + ($mergeRow['total_len'] / ($this->shiftAvgSpeed == 0 ? 1 : $this->shiftAvgSpeed )* 60) );
+                        } else {
+                            $mergeRow['start_time'] = $preRowEndTime;
+                            $mergeRow['calc_end_time'] = date('H:i:s', strtotime($mergeRow['start_time']) + ($mergeRow['total_len'] / ($this->shiftAvgSpeed == 0 ? 1 : $this->shiftAvgSpeed ) * 60) );
+                        }
+                        $preRowEndTime = $mergeRow['calc_end_time'];
+                        $detail[] = $mergeRow;
+                    }
+                    sqlsrv_free_stmt($stmt);
+                    sqlsrv_close($conn);
+                    $emitStr = json_encode([
+                        'ret'=> 1,
+                        'data'=> $detail,
+                        'msg'=> 'success'
+                    ]);
+                } catch(\Exception $e) {
                     $emitStr = json_encode([
                         'ret'=> 0,
                         'data'=> null,
-                        'msg'=> ""
+                        'msg'=> $e->getMessage()
                     ]);
-                    try {
-                        $conn = sqlsrv_connect($config['DB_HOST'],[
-                            'Database'=> $config['DB_NAME'],
-                            'UID'=> $config['DB_USER'],
-                            'PWD'=> $config['DB_PWD'],
-                            "CharacterSet"=> "UTF-8"
-                        ]);
-                        if( $conn === false ){
-                            return json_encode(['ret'=>0,'data'=>NULL,'msg'=>'check line status']);;
-                        }
-                        $stmt = sqlsrv_query( $conn, "SELECT TOP 20 *, ISNULL(CASE 
-                        WHEN (paper_len / 1000.0 * cutting_qty) > (paper_len2 / 1000.0 * cutting_qty2) 
-                        THEN (paper_len / 1000.0 * cutting_qty * width / 1000.0) 
-                        ELSE (paper_len2 / 1000.0 * cutting_qty2 * width / 1000.0) 
-                        END, 0) AS calc_ord_area FROM MyOrder WITH (NOLOCK) ORDER BY sn ASC" );
-                        if( $stmt === false ){
-                            return json_encode(['ret'=>0,'data'=>NULL,'msg'=>'check table proddata']);;
-                        }
-                        $areaAdd = 0;
-                        $lenAdd = 0;
-                        $startTime = '';
-                        $detail = [];
-                        $preRowEndTime = time();
-                        while ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
-                            $rowData = [];
-                            $rowData['order_date'] = $row['order_date']?$row['order_date']->format("Y-m-d H:i:s"):"";
-                            $rowData['ask_date'] = $row['ask_date']?$row['ask_date']->format("Y-m-d"):"";
-                            $rowData['order_date2'] = $row['order_date2']?$row['order_date2']->format("Y-m-d H:i:s"):"";
-                            $rowData['ask_date2'] = $row['ask_date2']?$row['ask_date2']->format("Y-m-d"):"";
-                            $rowData['first_time'] = $row['first_time']?$row['first_time']->format("Y-m-d H:i:s"):"";
-                            $rowData['last_time'] = $row['last_time']?$row['last_time']->format("Y-m-d H:i:s"):"";
-                            $rowData['start_time'] = $row['start_time']?$row['start_time']->format("H:i:s"):"";
+                }
+                $this->socket->emit('MyOrderUdp'.$this->config_index, $emitStr);
 
-                            $mergeRow = $this->deelWithRow(array_replace($row, $rowData));
-                            $areaAdd += $mergeRow['calc_ord_area'];
-                            $lenAdd += $mergeRow['total_len'];
-                            $mergeRow['area_add_up'] = (int)$areaAdd;
-                            $mergeRow['len_add_up'] = (int)$lenAdd;
-                            $mergeRow['calc_ord_area'] = (int)$mergeRow['calc_ord_area'];
-                            // 计算预计开始和结束时间\
-                            if( $mergeRow['start_time'] ) {
-                                $mergeRow['calc_end_time'] = date('H:i:s', strtotime($mergeRow['start_time']) + ($mergeRow['total_len'] / ($this->shiftAvgSpeed == 0 ? 1 : $this->shiftAvgSpeed )* 60) );
-                            } else {
-                                $mergeRow['start_time'] = $preRowEndTime;
-                                $mergeRow['calc_end_time'] = date('H:i:s', strtotime($mergeRow['start_time']) + ($mergeRow['total_len'] / ($this->shiftAvgSpeed == 0 ? 1 : $this->shiftAvgSpeed ) * 60) );
-                            }
-                            $preRowEndTime = $mergeRow['calc_end_time'];
-                            $detail[] = $mergeRow;
-                        }
-                        sqlsrv_free_stmt($stmt);
-                        sqlsrv_close($conn);
-                        $emitStr = json_encode([
-                            'ret'=> 1,
-                            'data'=> $detail,
-                            'msg'=> 'success'
-                        ]);
-                    } catch(\Exception $e) {
-                        $emitStr = json_encode([
-                            'ret'=> 0,
-                            'data'=> null,
-                            'msg'=> $e->getMessage()
-                        ]);
-                    }
-                    $this->socket->emit('MyOrderUdp', $emitStr);
-
-                });
-            }
+            });
+            /*}*/
         });
         $this->socket->on('disconnect', function($socket){
             var_dump('disconnect');
@@ -405,7 +421,13 @@ class Core extends Controller
                 // 特殊处理第9和第13个字段为字符串 
                 if ($j == 8 || $j == 12) { 
                     $asciiString = substr($data, $offset, 4); 
-                    $detail[$machineDetailFileds[$j]] = trim($asciiString); 
+                    $string = trim($asciiString);
+
+                    // 判断是否为UTF-8编码并转换
+                    if (!preg_match('//u', $string)) {
+                        $string = mb_convert_encoding($string, 'UTF-8', 'ASCII');
+                    }
+                    $detail[$machineDetailFileds[$j]] = $string;
                 } else { 
                     $detail[$machineDetailFileds[$j]] = unpack("L", substr($data, $offset, 4))[1]; 
                     if(in_array($machineDetailFileds[$j], ["sy", "lj"])) {

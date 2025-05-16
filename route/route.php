@@ -13,6 +13,8 @@
 Route::group(':version/sg/',function(){
 	Route::post('login','.LoginController/login');
 	Route::post('factoryName','.LoginController/getFactoryName');
+
+	Route::post('wechat/locale','.LoginController/fetchLocale');
 })->prefix('sg/:version');
 
 Route::group(':version/sg/',function(){
@@ -35,4 +37,10 @@ Route::group(':version/sg/',function(){
 
 	Route::post('statis/getConfig','.StatisController/getStatisConfig');
 	Route::post('statis/getStatisData', '.StatisController/getStatisData');
+
+
+	// 报表接口
+	Route::post('statis/fetchPaperFinishList','.StatisController/fetchPaperFinishList');
+	Route::post('statis/fetchPaperFinishAnalysisData','.StatisController/fetchPaperFinishAnalysisData');
+
 })->prefix('sg/:version')->middleware(['CheckSg']);

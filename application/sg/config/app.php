@@ -18,10 +18,10 @@ return [
             'paperCodeNumber'    => 1, //纸质代码占几个字符
             'paperCodeSpaceChar' => '-',
             'socketio'   => [
-                'port'   => 55555,//这个端口号好像可以随意配置（不同线不一样）
+                'port'   => 50007,//这个端口号好像可以随意配置（不同线不一样）
                 'timer'  => 1,//php中间层接受udp的时间间隔（单位：秒，决定了前端页面显示的数据每隔多少秒刷新1次）
                 //'domain' => 'http://jxrs.leaper.ltd:42000',//'http://test.leaper.ltd:8888',
-                "domain"=> "http://127.0.0.1:55555"
+                "domain"=> "https://lpkj.leaper.ltd:50007"
             ],
             'socket_bind' => [
                 'address' => '192.168.0.19',//安装php环境的电脑内网ip
@@ -44,7 +44,7 @@ return [
             'socketio'   => [
                 'port'   => 60000,//这个端口号好像可以随意配置（不同线不一样）
                 'timer'  => 1,//php中间层接受udp的时间间隔（单位：秒，决定了前端页面显示的数据每隔多少秒刷新1次）
-                'domain' => 'http://jsxc.leaper.ltd:60000'//'http://test.leaper.ltd:8888',
+                'domain' => 'https://lpkj.leaper.ltd:50008'//'http://test.leaper.ltd:8888',
             ],
             'socket_bind' => [
                 'address' => '192.168.0.19',//'192.168.1.195',//安装php环境的电脑内网ip

@@ -47,6 +47,7 @@ class LoginController extends Controller
 		$acceptLanguage = Request::header('accept-language');
 		$languages = explode(',', $acceptLanguage);  
     	$primaryLanguage = "";  
+    	$language = 'zh-CN';
    		foreach ($languages as $lang) {
    			if (preg_match('/^([a-z]{1,8}(-[a-z]{1,8})*)(\s*;\s*q\s*=\s*(\d{1}(\.\d+)?))?$/i', $lang, $matches)) {
    				list(, $language, $priorityPart) = $matches;
@@ -58,5 +59,10 @@ class LoginController extends Controller
    			$lang = util::getLanguage('en');
    		}
 		return ['errorCode'=>'00000','msg'=> $lang['return'].$lang['success'],'result'=>config('factory_name')];
+	}
+
+	public function fetchLocale() 
+	{
+		return ["statusCode"=> 200, "message"=> "", "data"=> ["test"=> "测试"]];
 	}
 }

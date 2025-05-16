@@ -11,11 +11,50 @@ class StatisValidate extends Validate
 		'class'       => 'require|in:A,B,C,D,ALL',
 		'line'        => 'require|checkLine',
 		'time_type'   => 'require|in:1,2,3',  //1按天 2按周 3按月
-		'statis_type' => 'require|in:sumArea,sumLen,avgSpeed,sumLoss,sumStops'
+		'statis_type' => 'require|in:sumArea,sumLen,avgSpeed,sumLoss,sumStops',
+		'dataType'=> 'require|in:4,5,6,7,9',
+		'companyName'=> 'max:100',
+		'className'=> 'max:10',
+		'width'=> ['max:10', 'regex'=>'/^[0-9]$/'],
+		'bdL'=> ['max:10', 'regex'=>'/^[0-9]$/'],
+		'bdW'=> ['max:10', 'regex'=>'/^[0-9]$/'],
+		'fluteType'=> 'max:100',
+		'paperCode'=> 'max:100',
+		'beginDate'=> 'require|dateFormat:Y-m-d',
+		'endDate'=> 'require|dateFormat:Y-m-d',
+		'lineNum'=> ['require', 'regex'=>'/^[0-9]{1,3}$/', 'checkIndex', "checkLineNew"],
+		'orderSource'=> ["require", "in:1,2,3"], //1->全部 2->车间加单 3->erp
 	];
 
 	protected $scene = [
-		'getStatisData' => ['begin_date','end_date','class','line','time_type','statis_type']
+		'getStatisData' => ['begin_date','end_date','class','line','time_type','statis_type'],
+		"paperFinish"=> [
+			"dataType", 
+			"companyName",
+			"className",
+			"width",
+			"bdL",
+			"bdW",
+			"fluteType",
+			"paperCode",
+			"beginDate",
+			"endDate",
+			"lineNum",
+			"orderSource"
+		],
+		"paperFinishAnalysis"=> [
+			"companyName",
+			"className",
+			"width",
+			"bdL",
+			"bdW",
+			"fluteType",
+			"paperCode",
+			"beginDate",
+			"endDate",
+			"lineNum",
+			"orderSource"
+		]
 	];
 
 	protected function checkStatisDate( $value,$rule,$data,$fieldName )
@@ -46,5 +85,18 @@ class StatisValidate extends Validate
 		if( $value === 'ALL' ) return true;
 		if( preg_match_all("/^[0-9]{1}$/", $value) >= 1 && isset( config('app.db_config')[$value] ) ) return true;
 		return '线别参数错误';
+	}
+
+	protected function checkIndex( $value,$rule,$data,$fieldName )
+	{
+		return isset(config('app.db_config')[$value]) ? true : $fieldName.'参数不正确';
+	}
+
+	protected function checkLineNew( $value,$rule,$data,$fieldName ) 
+	{
+		if( isset(config('app.db_config')[$value]) && config('app.db_config')[$value]["isnew"] == 1 ) {
+			return true;
+		}
+		return "生产线不支持";
 	}
 }
