@@ -134,13 +134,26 @@ class SelectController extends Controller
 			$table_data_son = [];
 			for ( $k = 0; $k < count($ceng_info); $k++ ) { 
 				if( isset($new_data[ $ceng_info[ $k ] ][ $i ]) ){
-					$table_data_son[ $ceng_info[ $k ] ] = $new_data[ $ceng_info[ $k ] ][ $i ]['PaperCode'] . '*' . $new_data[ $ceng_info[ $k ] ][ $i ]['PaperWidth'] . '=' . $new_data[ $ceng_info[ $k ] ][ $i ]['PaperLength'];
+					$paperCode = $this->autoToUtf8($new_data[$ceng_info[$k]][$i]['PaperCode']);
+					$paperWidth = $new_data[$ceng_info[$k]][$i]['PaperWidth'];
+            		$paperLength = $new_data[$ceng_info[$k]][$i]['PaperLength'];
+            		$table_data_son[$ceng_info[$k]] = $paperCode . '*' . $paperWidth . '=' . $paperLength;
 				}
 			}
 			$table_data[ $i ] = $table_data_son;
 		}
 		
 		return ['errorCode'=>'00000','msg'=> $this->request->lang['return'] . $this->request->lang['success'],'result'=>$table_data];
+	}
+
+	protected function autoToUtf8($str) {
+		if (is_string($str)) {
+			$encoding = mb_detect_encoding($str, ['UTF-8', 'GBK', 'BIG5', 'ISO-8859-1'], true);
+			if ($encoding != 'UTF-8') {
+				return iconv($encoding, 'UTF-8//IGNORE', $str);
+			}
+		}
+		return $str;
 	}
 
 	protected function getBlmsWeight( $connect )

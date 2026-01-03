@@ -18,23 +18,7 @@ class Core extends Controller
     {
         $this->config_index = $config_index;
         $config = config('db_config')[ $this->config_index ];
-
-        // 判断是否使用https
-        $useHttps = isset($config['socketio']['domain']) && stripos($config['socketio']['domain'], 'https://') === 0;
-
-        // 初始化 Socket.IO 配置
-        $socketOptions = [];
-        if ($useHttps) {
-            $socketOptions = [
-                'ssl' => [
-                    'local_cert' => '/path/to/your/cert.pem',
-                    'local_pk' => '/path/to/your/privkey.pem',
-                    'verify_peer' => false
-                ]
-            ];
-        }
-
-        $this->socket = new SocketIO($config['socketio']['port'], $socketOptions);
+        $this->socket = new SocketIO($config['socketio']['port']);
         $this->socket->on('workerStart', function($socket)use($config){
             Timer::add(1,function()use($config){
                 if( $config['DB_DATA'] ){
@@ -45,7 +29,6 @@ class Core extends Controller
                 var_dump($data);
                 $this->socket->emit('AnalyUdpData'.$this->config_index, $data );
             });
-            /*if($this->config_index == 0) {*/
             Timer::add(5, function()use($config){
                 $emitStr = json_encode([
                     'ret'=> 0,
@@ -118,7 +101,6 @@ class Core extends Controller
                 $this->socket->emit('MyOrderUdp'.$this->config_index, $emitStr);
 
             });
-            /*}*/
         });
         $this->socket->on('disconnect', function($socket){
             var_dump('disconnect');
